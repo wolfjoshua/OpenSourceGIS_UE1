@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8"/>
+
+    <title>Geoportal_Uebung_1</title>
+	<img src="https://www.mintfit.hamburg/wp-content/uploads/2020/01/HCU_Logo_de_RGB_blau.png" alt="Logo HCU"  width="10%" height="auto" align="right" />
+
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v6.3.1/css/ol.css">
+    <link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@3.5.0/src/ol-layerswitcher.css" />
+
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v6.3.1/build/ol.js"></script>
+    <script src="https://unpkg.com/ol-layerswitcher@3.5.0"></script>
+
+	<style>
+     .map {
+        width: 100%;
+        height:850px;
+      }
+      .map:-webkit-full-screen {
+        height: 100%;
+        margin: 0;
+      }
+      .map:-ms-fullscreen {
+        height: 100%;
+      }
+      .map:fullscreen {
+        height: 100%;
+      }
+      .ol-rotate {
+        top: 3em;
+      }
+    </style>
+
+  </head>
+
+<body style="background-color:AliceBlue; font-family:verdana;font-size:14px" >
+
+
+<h1 style="font-family:verdana;font-size:26px"> Geoportal zur Mobilit&aumlt in Hamburg </h1>
+<p>  &Uumlbung 1 im Kurs Geodateninfrastrukturen  </p>
+<p> von Maria Riegel und Joshua Wolf</p>
+
+	<div id="map" class="map"></div>
+
+    <script type="text/javascript">
+
+		var extent = [510000.0, 5850000.0, 625000.4, 6000000.0];
+
+        ol.proj.addProjection(new ol.proj.Projection({
+            code: 'EPSG:25832',
+            units: 'm',
+            extent: extent,
+            axisOrientation: 'enu', 
+            global: false  
+        }));
+        var proj25832 = ol.proj.get('EPSG:25832');
+
+	  var map = new ol.Map({
+
+		target: 'map',
+
+        controls: ol.control.defaults().extend([
+			new ol.control.ZoomSlider(),
+			new ol.control.LayerSwitcher(),
+			new ol.control.FullScreen()
+			]),
+
+		layers: [
+		
+		    new ol.layer.Group({ 
+            title: 'Hintergrundkarten',
+            layers: [
+			
+          new ol.layer.Tile({
+			title: "DOP20",
+			source: new ol.source.TileWMS({
+			  url: 'http://geodienste.hamburg.de/HH_WMS_DOP',
+			  type: 'base',
+			  attributions: [
+            			'<a href="http://www.geoinfo.hamburg.de">Landesbetrieb Geoinformation und Vermessung</a>'
+                          ],
+			  params: {
+				'LAYERS': '1',
+				'FORMAT': 'image/jpeg'
+			  }
+			})
+		  }),
+
+          new ol.layer.Tile({
+			title: "Stadtplan-Schwarz/Grau",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_Geobasiskarten_SG',
+			  type: 'base',
+			  attributions: [
+            			'<a href="http://www.geoinfo.hamburg.de">Landesbetrieb Geoinformation und Vermessung</a>'
+                          ],
+			  params: {
+				'LAYERS': '1,5,9,13,17,21,25,29',
+				'FORMAT': 'image/jpeg'
+			  }
+			}),
+			opacity: 0.5
+		  }),
+]}),
+		    new ol.layer.Group({
+            title: 'Fachplanung',
+            layers: [
+		  new ol.layer.Tile({
+			title: "Schutzgebietskarte",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_Schutzgebiete?',
+			  params: {
+				'LAYERS': 'schutzgebiete,nr_f_ffh_gebiet,nr_f_eg_vogelschutzgebiet,nr_f_biosphaerenreservat,nr_f_landschaftsschutzgebiet,nr_f_nationalpark,nr_f_naturdenkmal,nr_f_naturschutzgebiet,nr_f_ramsargebiet',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+
+		  new ol.layer.Tile({
+			title: "&Uumlberschwemmungskarte",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_UESG?',
+			  params: {
+				'LAYERS': 'ueberschwemmungsgebiete',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+
+				  
+		  new ol.layer.Tile({
+			title: "Bebauungspl&aumlne im Verfahren",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_Bebauungsplaene',
+			  params: {
+				'LAYERS': 'hh_lgv_imverfahren',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+
+		  new ol.layer.Tile({
+			title: "Bebauungspl&aumlne Festgestellt",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_Bebauungsplaene',
+			  params: {
+				'LAYERS': 'hh_hh_festgestellt',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+
+
+		  new ol.layer.Tile({
+			title: "Fl&aumlchennutzungsplan",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_FNP?',
+			  params: {
+				'LAYERS': '2,3,4,5,6,9,10',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+]}),
+		    new ol.layer.Group({
+            title: 'Individualverkehr',
+            layers: [		  
+		  new ol.layer.Tile({
+			title: "Straßenl&aumlrmkarte",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_Strassenverkehr?',
+			  params: {
+				'LAYERS': 'laermkarten_strassenverkehr',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "L&aumlrmschutzbauwerke",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_Brueckenbauwerke?',
+			  params: {
+				'LAYERS': 'laermschutzbauwerke',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "Tempo 30 Zonen in Hamburg",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_Tempo_30_Zonen?',
+			  params: {
+				'LAYERS': 'tempo_30_zonen',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "Bundesautobahnen",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_Dynamisches_Koordinierungsnetz?',
+			  params: {
+				'LAYERS': 'verkehrsmengen_dtvw_bab_2013',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "Hauptverkehrsstraßen",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_Dynamisches_Koordinierungsnetz?',
+			  params: {
+				'LAYERS': 'hauptverkehrsstrassen',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+	  
+		  
+		  
+
+		  
+]}),
+		    new ol.layer.Group({
+            title: '&Oumlffentlicher Personennahverkehr',
+            layers: [		  
+		  new ol.layer.Tile({
+			title: "P+R-Anlagen",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_P_und_R?',
+			  params: {
+				'LAYERS': 'p_und_r',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+
+		  new ol.layer.Tile({
+			title: "HVV-Tunnel",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_HHA_Tunnel_metaver?',
+			  params: {
+				'LAYERS': 'hha_tunnel',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "Einzugsbereich AKN",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_HVV_Einzugsbereiche?',
+			  params: {
+				'LAYERS': 'hvv_bahn_a',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "Einzugsbereich RE/RB",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_HVV_Einzugsbereiche?',
+			  params: {
+				'LAYERS': 'hvv_bahn_r',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "Einzugsbereich S-Bahn",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_HVV_Einzugsbereiche?',
+			  params: {
+				'LAYERS': 'hvv_bahn_s',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "Einzugsbereich U-Bahn",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_HVV_Einzugsbereiche?',
+			  params: {
+				'LAYERS': 'hvv_bahn_u',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "Einzugsbereich Bus",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/HH_WMS_HVV_Einzugsbereiche?',
+			  params: {
+				'LAYERS': 'hvv_masten',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  
+		  new ol.layer.Tile({
+			title: "HVV Servicestellen",
+			source: new ol.source.TileWMS({
+			  url: 'https://geodienste.hamburg.de/wms_hvv?',
+			  params: {
+				'LAYERS': 'geofoxdb_servicestellen',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  }),
+		  
+		  new ol.layer.Tile({
+			title: "HVV Linien",
+			source: new ol.source.TileWMS({
+			  url: 'http://extmap.hbt.de:80/geoserver/geofox_workspace/ows?',
+			  params: {
+				'LAYERS': 'geofoxdb_strecken',
+				'FORMAT': 'image/png'
+			  }
+			}),
+			visible: false
+		  })
+]})		   
+
+        ],
+
+
+
+        view: new ol.View({
+          projection: proj25832,
+          center: [565874, 5934140],
+          zoom: 0.1,
+          resolutions : [66.14579761460263, 26.458319045841046, 15.874991427504629, 10.583327618336419, 5.2916638091682096, 2.6458319045841048, 1.3229159522920524, 0.6614579761460262, 0.2645831904584105],
+          maxResolution: "auto"
+        })
+      });
+
+
+    </script>
+  </body>
+</html>
